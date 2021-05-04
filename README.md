@@ -1,4 +1,4 @@
-Práctica 10 - Cliente y servidor para una aplicación de procesamiento de notas de texto
+# Práctica 10 - Cliente y servidor para una aplicación de procesamiento de notas de texto
 
 [![Coverage Status](https://coveralls.io/repos/github/ULL-ESIT-INF-DSI-2021/ull-esit-inf-dsi-20-21-prct10-async-sockets-alu0101206479/badge.svg?branch=master)](https://coveralls.io/github/ULL-ESIT-INF-DSI-2021/ull-esit-inf-dsi-20-21-prct10-async-sockets-alu0101206479?branch=master)
 
