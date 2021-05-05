@@ -1,11 +1,8 @@
 import 'mocha';
-import {expect} from 'chai';
-import {hola} from '../src/ejercicio-1';
+import {expect} from 'chai'; ;
 
-describe('Pruebas de la aplicación y sus clases', ()=> {
-  describe('Pruebas clase Nota', ()=> {
-    it('expect(notaUno).to.not.be.equal(null);', ()=>{
-      expect(hola()).to.be.equal("hola");
-    });
+describe('Primera prueba', ()=> {
+  it('expect("hola").to.be.equal("hola");', ()=>{
+    expect("hola").to.be.equal("hola");
   });
 });
