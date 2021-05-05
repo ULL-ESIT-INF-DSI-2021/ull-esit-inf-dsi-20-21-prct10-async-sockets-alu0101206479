@@ -1,12 +1,31 @@
 import * as net from 'net';
 
-const client = net.connect({port: 60300});
+if (process.argv.length < 3) {
+  console.log('No se ha especificado ningún comando por la línea de comandos');
+} else {
+  const client = net.connect({port: 60300});
 
-client.on('data', (dataJSON) => {
+  const comando = {
+    comando: process.argv[2],
+    argumentos: [''],
+  };
 
-    console.log(`Connection established: watching file ${dataJSON}`);
+  comando.argumentos.pop();
+  for (let i = 3; i < process.argv.length; i++) {
+    comando.argumentos.push(process.argv[i]);
+  }
 
-    console.log('File has been modified.');
-    console.log(`Previous size`);
-    console.log(`Current size:`);
-});
+  client.write(JSON.stringify(comando), () => {
+    client.end();
+  });
+
+  let resultadoTexto = '';
+  client.on('data', (parte) => {
+    resultadoTexto += parte;
+  });
+  console.log(resultadoTexto);
+  client.on('end', () => {
+    console.log(resultadoTexto);
+  });
+}
+
