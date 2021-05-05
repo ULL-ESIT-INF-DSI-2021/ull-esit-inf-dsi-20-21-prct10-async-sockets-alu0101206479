@@ -1,18 +1,24 @@
 import * as net from 'net';
 
-  net.createServer((connection) => {
-    console.log('A client has connected.');
 
-    connection.write(`Connection established: watching file ssss.\n`);
+const server = net.createServer((connection) => {
+  console.log('A client has connected.');
 
-      connection.write(`Size of file 32 was 30.\n`);
-      connection.write(`Size of file aaa now is sss.\n`);
-
-
-    connection.on('close', () => {
-      console.log('A client has disconnected.');
-    });
-  }).listen(60300, () => {
-    console.log('Waiting for clients to connect.');
+  let comando = '';
+  connection.on('data', (parte) => {
+    comando += parte;
   });
 
+  connection.on('end', () => {
+    const message = JSON.parse(comando);
+    console.log(message);
+  });
+
+  connection.on('close', () => {
+    console.log('A client has disconnected');
+  });
+});
+
+server.listen(60300, () => {
+  console.log('Waiting for clients to connect.');
+});
