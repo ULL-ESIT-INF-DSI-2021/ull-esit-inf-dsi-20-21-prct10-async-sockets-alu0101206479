@@ -1,22 +1,22 @@
 import * as net from 'net';
 import yargs = require('yargs');
 import * as chalk from 'chalk';
-import {RequestType} from './types';
+import {ResponseType, RequestType} from './types';
+import {EventEmitterClient} from './EventEmitterClient';
 
 if (process.argv.length < 3) {
   console.log('\nNo se ha especificado ningún comando por la línea de comandos\n');
 } else {
   const client = net.connect({port: 60300});
+  const emitter = new EventEmitterClient(client);
 
-  let mensajeTexto = '';
-  client.on('data', (parteMensaje) => {
-    mensajeTexto += parteMensaje.toString();
-
-    const mensaje = JSON.parse(mensajeTexto);
-
-    switch (mensaje.type) {
+  /**
+   * Manejador para cuando el objeto EventEmitterClient emite el evento 'response'
+   */
+  emitter.on('response', (respuesta: ResponseType) => {
+    switch (respuesta.type) {
       case 'add':
-        if (mensaje.success == true) {
+        if (respuesta.success == true) {
           console.log(chalk.green('\nNew note added!\n'));
         } else {
           console.log(chalk.red("\nNote title taken!\n"));
@@ -24,19 +24,82 @@ if (process.argv.length < 3) {
         break;
 
       case 'update':
-        if (mensaje.success == true) {
-          console.log(mensaje.modified);
-          if (mensaje.modified == "title") {
+        if (respuesta.success == true) {
+          if (respuesta.modified == "title") {
             console.log(chalk.green('\nNote title modified!\n'));
           }
-          if (mensaje.modified == "body") {
+          if (respuesta.modified == "body") {
             console.log(chalk.green('\nNote body modified!\n'));
           }
-          if (mensaje.modified == "color") {
+          if (respuesta.modified == "color") {
             console.log(chalk.green('\nNote color modified!\n'));
           }
         } else {
           console.log(chalk.red("\nNo note found\n"));
+        }
+        break;
+
+      case 'remove':
+        if (respuesta.success == true) {
+          console.log(chalk.green('\nNote removed!\n'));
+        } else {
+          console.log(chalk.red("\nNo note found\n"));
+        }
+        break;
+
+      case 'list':
+        console.log("\nYour notes\n");
+        if (respuesta.notes == undefined || respuesta.notes == []) {
+          console.log(chalk.red(`The user haven't notes`));
+        } else {
+          respuesta.notes.forEach((nota) => {
+            switch (nota.color) {
+              case "red":
+                console.log(chalk.red(`${nota.title}`));
+                break;
+              case "green":
+                console.log(chalk.green(`${nota.title}`));
+                break;
+              case "blue":
+                console.log(chalk.blue(`${nota.title}`));
+                break;
+              case "yellow":
+                console.log(chalk.yellow(`${nota.title}`));
+                break;
+              default:
+                break;
+            }
+          });
+        }
+        console.log();
+        break;
+
+      case 'read':
+        if (respuesta.success == true) {
+          if (respuesta.notes != undefined) {
+            switch (respuesta.notes[0].color) {
+              case "red":
+                console.log(chalk.red(`\n${respuesta.notes[0].title}`));
+                console.log(chalk.red(`${respuesta.notes[0].body}\n`));
+                break;
+              case "green":
+                console.log(chalk.green(`\n${respuesta.notes[0].title}`));
+                console.log(chalk.green(`${respuesta.notes[0].body}\n`));
+                break;
+              case "blue":
+                console.log(chalk.blue(`\n${respuesta.notes[0].title}`));
+                console.log(chalk.blue(`${respuesta.notes[0].body}\n`));
+                break;
+              case "yellow":
+                console.log(chalk.yellow(`\n${respuesta.notes[0].title}`));
+                console.log(chalk.yellow(`${respuesta.notes[0].body}\n`));
+                break;
+              default:
+                break;
+            }
+          }
+        } else {
+          console.log(chalk.red("\nNote not found\n"));
         }
         break;
 
@@ -45,6 +108,9 @@ if (process.argv.length < 3) {
     }
   });
 
+  /**
+   * Comando add, sirve para añadir nuevas notas a un usuario
+   */
   yargs.command( {
     command: 'add',
     describe: 'Add a new note',
@@ -89,6 +155,9 @@ if (process.argv.length < 3) {
     },
   });
 
+  /**
+   * Comando update, sirve para modificar una nota concreta de un usuario
+   */
   yargs.command( {
     command: 'update',
     describe: 'Update a note',
@@ -145,6 +214,9 @@ if (process.argv.length < 3) {
     },
   });
 
+  /**
+   * Comando remove, sirve para borrar una nota concreta de un usuario
+   */
   yargs.command( {
     command: 'remove',
     describe: 'Remove a note',
@@ -168,13 +240,18 @@ if (process.argv.length < 3) {
           title: argv.title,
         };
 
-        client.write(`${JSON.stringify(comando)}\n`, () => {
-          console.log("Enviado");
+        client.write(`${JSON.stringify(comando)}\n`, (err) => {
+          if (err) {
+            console.log(`\nNo se ha podido enviar el mensaje ${JSON.stringify(comando)} al servidor`);
+          }
         });
       }
     },
   });
 
+  /**
+   * Comando list, sirve para listar las notas de un usuario
+   */
   yargs.command( {
     command: 'list',
     describe: 'List notes of a concrect user',
@@ -192,13 +269,18 @@ if (process.argv.length < 3) {
           user: argv.user,
         };
 
-        client.write(`${JSON.stringify(comando)}\n`, () => {
-          console.log("Enviado");
+        client.write(`${JSON.stringify(comando)}\n`, (err) => {
+          if (err) {
+            console.log(`\nNo se ha podido enviar el mensaje ${JSON.stringify(comando)} al servidor`);
+          }
         });
       }
     },
   });
 
+  /**
+   * Comando read, sirve para leer una nota concreta de un usuario
+   */
   yargs.command( {
     command: 'read',
     describe: 'Read a note',
@@ -222,8 +304,10 @@ if (process.argv.length < 3) {
           title: argv.title,
         };
 
-        client.write(`${JSON.stringify(comando)}\n`, () => {
-          console.log("Enviado");
+        client.write(`${JSON.stringify(comando)}\n`, (err) => {
+          if (err) {
+            console.log(`\nNo se ha podido enviar el mensaje ${JSON.stringify(comando)} al servidor`);
+          }
         });
       }
     },

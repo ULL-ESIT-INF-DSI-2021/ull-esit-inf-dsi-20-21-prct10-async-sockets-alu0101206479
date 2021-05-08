@@ -33,7 +33,7 @@ export class Nota {
   /**
    * ```typescript
    * // Ejemplo de llamada
-   *  usuario.setTitulo("Blue note");
+   *  nota.setTitulo("Blue note");
    * ```
    * Función para cambiar el título de la nota
    * @param titulo Nuevo título que tendrá la nota
@@ -74,7 +74,7 @@ export class Nota {
    * Función que retorna el color de la nota
    * @return El atributo color
    */
-  getColor() {
+  public getColor() {
     return this.color;
   }
 

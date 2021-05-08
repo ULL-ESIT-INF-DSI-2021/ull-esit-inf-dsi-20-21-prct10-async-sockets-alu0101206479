@@ -1,5 +1,3 @@
-import {Nota} from "./nota";
-
 
 export type RequestType = {
   type: 'add' | 'update' | 'remove' | 'read' | 'list';
@@ -15,6 +13,10 @@ export type RequestType = {
 export type ResponseType = {
   type: 'add' | 'update' | 'remove' | 'read' | 'list';
   success: boolean;
-  notes?: Nota[];
+  notes?: {
+    title: string,
+    body: string,
+    color: string,
+  }[];
   modified?: string;
 }

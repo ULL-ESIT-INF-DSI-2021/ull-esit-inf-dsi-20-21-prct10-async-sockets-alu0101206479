@@ -1,6 +1,5 @@
 import {Nota} from './nota';
 import * as fs from 'fs';
-import * as chalk from 'chalk';
 
 /**
  * ```typescript
@@ -150,14 +149,14 @@ export class Usuario {
    * // Ejemplo de llamada
    *  usuario.borrarNota("Red note");
    * ```
-   * Función que le borra una nota concreta al usuario, tanto del atributo notas como del directorio del usuario
+   * Función que le borra una nota concreta al usuario, tanto del atributo notas como del directorio del usuario y retorna true o false dependiendo si se borro la nota o no
    * @param titulo Título de la nota que se quiere eliminar
    */
   public borrarNota(titulo: string) {
     const ficheroExiste: boolean = fs.existsSync(`src/ejercicio-practica/usuarios/${this.nombre}/${titulo}.json`);
 
     if (ficheroExiste == false) {
-      console.log(chalk.red("No note found"));
+      return false;
     } else {
       let indice: number = 0;
       let i = 0;
@@ -169,9 +168,9 @@ export class Usuario {
       });
       this.notas.splice(indice, 1);
 
-      fs.rm(`src/ejercicio-practica/usuarios/${this.nombre}/${titulo}.json`, () => {
-        console.log(chalk.green('Note removed!'));
-      });
+      fs.rmSync(`src/ejercicio-practica/usuarios/${this.nombre}/${titulo}.json`);
+
+      return true;
     }
   }
 
@@ -180,30 +179,10 @@ export class Usuario {
    * // Ejemplo de llamada
    *  usuario.listarNotas();
    * ```
-   * Función que lista todas las notas del usuario
+   * Función para listar todas las notas del usuario y retorna todas las notas de este
    */
   public listarNotas() {
-    console.log("Your notes");
-    this.notas.forEach((nota) => {
-      const color = nota.getColor();
-
-      switch (color) {
-        case "red":
-          console.log(chalk.red(`${nota.getTitulo()}`));
-          break;
-        case "green":
-          console.log(chalk.green(`${nota.getTitulo()}`));
-          break;
-        case "blue":
-          console.log(chalk.blue(`${nota.getTitulo()}`));
-          break;
-        case "yellow":
-          console.log(chalk.yellow(`${nota.getTitulo()}`));
-          break;
-        default:
-          break;
-      }
-    });
+    return this.notas;
   }
 
   /**
@@ -211,14 +190,19 @@ export class Usuario {
    * // Ejemplo de llamada
    *  usuario.leerNota("Red note");
    * ```
-   * Función para leer una nota concreta del usuario
+   * Función para leer una nota concreta del usuario que retorna un JSON con la nota que se quiere leer y si se ha encontrado
    * @param titulo Título de la nota que se quiere leer
    */
   public leerNota(titulo: string) {
     const ficheroExiste: boolean = fs.existsSync(`src/ejercicio-practica/usuarios/${this.nombre}/${titulo}.json`);
 
+    const salida = {
+      success: true,
+      nota: this.notas[0],
+    };
+
     if (ficheroExiste == false) {
-      console.log(chalk.red("Note not found"));
+      salida.success = false;
     } else {
       let indice: number = 0;
       let i = 0;
@@ -229,28 +213,9 @@ export class Usuario {
         i++;
       });
 
-      const color = this.notas[indice].getColor();
-
-      switch (color) {
-        case "red":
-          console.log(chalk.red(`${this.notas[indice].getTitulo()}`));
-          console.log(chalk.red(`${this.notas[indice].getCuerpo()}`));
-          break;
-        case "green":
-          console.log(chalk.green(`${this.notas[indice].getTitulo()}`));
-          console.log(chalk.green(`${this.notas[indice].getCuerpo()}`));
-          break;
-        case "blue":
-          console.log(chalk.blue(`${this.notas[indice].getTitulo()}`));
-          console.log(chalk.blue(`${this.notas[indice].getCuerpo()}`));
-          break;
-        case "yellow":
-          console.log(chalk.yellow(`${this.notas[indice].getTitulo()}`));
-          console.log(chalk.yellow(`${this.notas[indice].getCuerpo()}`));
-          break;
-        default:
-          break;
-      }
+      salida.nota = this.notas[indice];
     }
+
+    return salida;
   }
 }
