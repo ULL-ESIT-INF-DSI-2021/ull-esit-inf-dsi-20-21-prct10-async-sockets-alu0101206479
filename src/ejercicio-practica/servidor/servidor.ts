@@ -1,7 +1,7 @@
 import {EventEmitterServer} from './EventEmitterServer';
 import * as net from 'net';
-import {ResponseType} from './types';
-import {Usuario} from './usuario';
+import {ResponseType} from '../types';
+import {Usuario} from '../note-app/usuario';
 
 const server = net.createServer((connection) => {
   console.log('\nUn cliente se ha conenctado\n');

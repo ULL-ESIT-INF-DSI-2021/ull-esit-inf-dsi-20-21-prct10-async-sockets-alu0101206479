@@ -1,7 +1,7 @@
 import * as net from 'net';
 import yargs = require('yargs');
 import * as chalk from 'chalk';
-import {ResponseType, RequestType} from './types';
+import {ResponseType, RequestType} from '../types';
 import {EventEmitterClient} from './EventEmitterClient';
 
 if (process.argv.length < 3) {
