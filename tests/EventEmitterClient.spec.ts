@@ -1,26 +1,29 @@
 import 'mocha';
 import {expect} from 'chai';
 import {EventEmitter} from 'events';
-import {EventEmitterServer} from '../src/ejercicio-practica/servidor/EventEmitterServer';
-import {RequestType} from '../src/ejercicio-practica/types';
+import {EventEmitterClient} from '../src/ejercicio-practica/cliente/EventEmitterClient';
+import {ResponseType} from '../src/ejercicio-practica/types';
 
-describe('Prueba de la clase EventEmitterServer', ()=> {
-  it('Se debería emitir un evento request con todo el mensaje, aunque este se envíe por partes', ()=>{
+describe('Prueba de la clase EventEmitterClient', ()=> {
+  it('Se debería emitir un evento response con todo el mensaje, aunque este se envíe por partes', ()=>{
     const socket = new EventEmitter();
-    const client = new EventEmitterServer(socket);
+    const client = new EventEmitterClient(socket);
+    const nota = {
+      title: "Red note",
+      body: "This is a red note",
+      color: "red",
+    };
 
-    client.on('request', (solicitud: RequestType) => {
-      expect(solicitud.type).to.be.equal("add");
-      expect(solicitud.user).to.be.equal("alu0101206479");
-      expect(solicitud.title).to.be.equal("Red note");
-      expect(solicitud.body).to.be.equal("This is a red note");
-      expect(solicitud.color).to.be.equal("red");
+    client.on('response', (solicitud: ResponseType) => {
+      expect(solicitud.type).to.be.equal("read");
+      expect(solicitud.success).to.be.equal("true");
+      expect(solicitud.notes).to.deep.equal([nota]);
+      expect(solicitud.modified).to.be.equal("title");
     });
 
-    socket.emit('data', '{"type": "add",');
-    socket.emit('data', ' "user": "alu0101206479", ');
-    socket.emit('data', `"title": "Red note", `);
-    socket.emit('data', `"body": "This is a red note"`);
-    socket.emit('data', `, "color": "red"}\n`);
+    socket.emit('data', '{"type": "read", ');
+    socket.emit('data', `"success": "true", "notes": [${JSON.stringify(nota)}], `);
+    socket.emit('data', `"modified": "title"}`);
+    socket.emit('end');
   });
 });
