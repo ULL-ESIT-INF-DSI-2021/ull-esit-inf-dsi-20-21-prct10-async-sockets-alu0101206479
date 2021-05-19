@@ -8,6 +8,11 @@
     "coverage": "nyc npm test && nyc report --reporter=lcov",
     "startS": "tsc-watch --onSuccess \"node dist/ejercicio-clase/servidor.js\"",
     "startC": "tsc-watch --onSuccess \"node dist/ejercicio-clase/cliente.js ls -la src/ejercicio-clase\"",
+    "startAddUltimaPractica": "tsc-watch --onSuccess \"node dist/ejercicio-ultima-practica/addUser.js\"",
+    "startConsultUltimaPractica": "tsc-watch --onSuccess \"node dist/ejercicio-ultima-practica/consultUser.js\"",    
+    "startUpdateUltimaPractica": "tsc-watch --onSuccess \"node dist/ejercicio-ultima-practica/updateUser.js\"",    
+    "startRemoveUltimaPractica": "tsc-watch --onSuccess \"node dist/ejercicio-ultima-practica/removeUser.js\"",    
+
     "doc": "typedoc"
   },
   "repository": {
@@ -25,6 +30,7 @@
     "@types/chai": "^4.2.17",
     "@types/mocha": "^8.2.2",
     "@types/node": "^14.14.41",
+    "@types/validator": "^13.1.3",
     "@types/yargs": "^16.0.1",
     "@typescript-eslint/eslint-plugin": "^4.22.1",
     "@typescript-eslint/parser": "^4.22.1",
@@ -39,5 +45,9 @@
     "typedoc": "^0.20.36",
     "typescript": "^4.2.4",
     "yargs": "^16.2.0"
+  },
+  "dependencies": {
+    "mongoose": "^5.12.10",
+    "validator": "^13.6.0"
   }
 }
